@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Presensi Alumni Sekolah Islam</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Amiri (Arabic font) -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Inter:wght=300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SheetJS (XLSX) library for Excel export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f1; /* Soft green-gray tone */
+        }
+        .arabic-font {
+            font-family: 'Amiri', serif;
+        }
+        /* Custom scrollbar for beautiful UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #047857;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #065f46;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            200: '#a7f3d0',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        amber: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header Section -->
+    <header class="bg-gradient-to-r from-emerald-900 via-emerald-800 to-emerald-950 text-white shadow-lg border-b-4 border-amber-500 relative overflow-hidden">
+        <!-- Islamic Pattern Overlay Background -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="islamic-tile" width="60" height="60" patternUnits="userSpaceOnUse">
+                        <path d="M30 0 L60 30 L30 60 L0 30 Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                        <circle cx="30" cy="30" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M30 10 L30 50 M10 30 L50 30" stroke="currentColor" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#islamic-tile)" />
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left">
+                <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-5 mb-2">
+                    <!-- Striking Text Logo IKLAL (Highly Visible, Gold Elegant Accent) -->
+                    <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-emerald-950 font-black text-3xl sm:text-4xl px-6 py-3 rounded-2xl shadow-md border-2 border-amber-300 flex items-center justify-center transform hover:scale-105 transition duration-300 tracking-widest">
+                        IKLAL
+                    </div>
+                    <div class="text-center sm:text-left">
+                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Sistem Daftar Hadir Alumni</h1>
+                        <p class="text-amber-400 text-sm sm:text-base font-bold tracking-wider">IKATAN KELUARGA ALUMNI AL FATTAH (IKLAL)</p>
+                        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-1">
+                            <p class="text-emerald-200 text-xs font-semibold tracking-wide">TK, MI, MTs, SMA & Abituren</p>
+                            <!-- Live Connection Badge -->
+                            <span id="cloud-badge" class="inline-flex items-center gap-1.5 bg-yellow-950/60 px-2.5 py-0.5 rounded-full border border-yellow-500/30 text-[10px] text-yellow-300 font-medium">
+                                <span class="relative flex h-1.5 w-1.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-yellow-500"></span>
+                                </span>
+                                <span id="cloud-badge-text">Menghubungkan Awan...</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Updated Header Right Card with Enlarged Slogan -->
+            <div class="text-center md:text-right bg-emerald-950/40 p-4 rounded-xl border border-emerald-700/50 backdrop-blur-sm max-w-md">
+                <p class="arabic-font text-2xl text-amber-500">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</p>
+                <div class="mt-2.5 leading-relaxed">
+                    <!-- Enlarged and enhanced text styling -->
+                    <span class="block text-amber-400 font-black tracking-widest text-base sm:text-lg uppercase mb-1 drop-shadow-sm">
+                        REUNI AKBAR 2026
+                    </span>
+                    <span class="text-xs sm:text-sm text-emerald-100 font-semibold block leading-normal">
+                        Merajut Kembali Ukhuwah Alumni Dalam Rahim Al Fattah
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        
+        <!-- Toast Notification Box -->
+        <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-100px] opacity-0 transition-all duration-300 flex items-center gap-3 bg-emerald-800 text-white px-5 py-3 rounded-xl shadow-2xl border border-amber-500">
+            <div id="toast-icon" class="text-amber-500">
+                <i data-lucide="check-circle" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p id="toast-title" class="font-bold text-sm">Sukses!</p>
+                <p id="toast-desc" class="text-xs text-emerald-200">Data berhasil diproses.</p>
+            </div>
+        </div>
+
+        <!-- Custom Confirmation Modal -->
+        <div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden opacity-0 transition-all duration-300">
+            <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-emerald-50/50 transform scale-95 transition-all duration-300">
+                <div class="flex items-center gap-3 text-amber-500 mb-4">
+                    <div class="p-2.5 bg-amber-50 rounded-2xl">
+                        <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                    </div>
+                    <h3 id="modalTitle" class="text-lg font-bold text-slate-800">Konfirmasi Tindakan</h3>
+                </div>
+                <p id="modalMessage" class="text-sm text-slate-600 mb-6 leading-relaxed">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+                <div class="flex justify-end gap-3">
+                    <button id="modalCancelBtn" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition">
+                        Batal
+                    </button>
+                    <button id="modalConfirmBtn" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition shadow-md active:scale-95">
+                        Ya, Hapus Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Dashboard Section -->
+        <section class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+            <!-- Card Total (Kini Dilengkapi Rincian L/P yang Sangat Jelas) -->
+            <div class="bg-gradient-to-br from-emerald-800 to-emerald-900 text-white rounded-2xl p-4 shadow-md border-b-4 border-emerald-500 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Total Hadir</span>
+                    <i data-lucide="users" class="w-5 h-5 text-amber-500"></i>
+                </div>
+                <div class="mt-2 flex flex-col justify-end">
+                    <div class="flex items-baseline gap-2">
+                        <span id="stat-total" class="text-3xl font-extrabold">0</span>
+                        <span class="text-[10px] text-emerald-300">Tamu</span>
+                    </div>
+                    <!-- Gender Split Micro-Badges -->
+                    <div class="flex items-center gap-1.5 mt-2 text-[10px]">
+                        <span class="bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/40 font-bold text-blue-300 flex items-center gap-1" title="Laki-laki">
+                            <span id="stat-total-l">0</span> L
+                        </span>
+                        <span class="bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-700/40 font-bold text-pink-300 flex items-center gap-1" title="Perempuan">
+                            <span id="stat-total-p">0</span> P
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card TK -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Alumni TK</span>
+                    <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full">TK</span>
+                </div>
+                <div class="mt-4">
+                    <span id="stat-tk" class="text-2xl font-bold text-emerald-900">0</span>
+                    <span class="text-xs text-slate-500 block">Orang</span>
+                </div>
+            </div>
+
+            <!-- Card MI -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Alumni MI</span>
+                    <span class="px-2 py-0.5 bg-yellow-100 text-yellow-800 text-[10px] font-bold rounded-full">MI</span>
+                </div>
+                <div class="mt-4">
+                    <span id="stat-mi" class="text-2xl font-bold text-emerald-900">0</span>
+                    <span class="text-xs text-slate-500 block">Orang</span>
+                </div>
+            </div>
+
+            <!-- Card MTs -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Alumni MTs</span>
+                    <span class="px-2 py-0.5 bg-blue-100 text-blue-800 text-[10px] font-bold rounded-full">MTs</span>
+                </div>
+                <div class="mt-4">
+                    <span id="stat-mts" class="text-2xl font-bold text-emerald-900">0</span>
+                    <span class="text-xs text-slate-500 block">Orang</span>
+                </div>
+            </div>
+
+            <!-- Card SMA -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Alumni SMA</span>
+                    <span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-bold rounded-full">SMA</span>
+                </div>
+                <div class="mt-4">
+                    <span id="stat-sma" class="text-2xl font-bold text-emerald-900">0</span>
+                    <span class="text-xs text-slate-500 block">Orang</span>
+                </div>
+            </div>
+
+            <!-- Card Abituren -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Abituren</span>
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-full">Ponpes</span>
+                </div>
+                <div class="mt-4">
+                    <span id="stat-abituren" class="text-2xl font-bold text-emerald-900">0</span>
+                    <span class="text-xs text-slate-500 block">Orang</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Layout Split Grid (Form vs Table) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Column: Form Input (4 Cols on LG) -->
+            <section class="lg:col-span-4 bg-white rounded-3xl p-6 shadow-md border border-emerald-50/50 relative">
+                <!-- Decorative green element at the top -->
+                <div class="absolute top-0 inset-x-0 h-2 bg-emerald-700 rounded-t-3xl"></div>
+                
+                <div class="flex items-center gap-2 mb-6 mt-2">
+                    <i data-lucide="user-plus" class="w-6 h-6 text-emerald-700"></i>
+                    <h2 class="text-lg font-bold text-emerald-900">Input Kehadiran Tamu</h2>
+                </div>
+
+                <form id="attendanceForm" class="space-y-4">
+                    <!-- Name Input -->
+                    <div>
+                        <label for="fullName" class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="fullName" required placeholder="Contoh: Ahmad Fauzi, S.Pd" 
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <!-- Gender Input -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jenis Kelamin <span class="text-red-500">*</span></label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2.5 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-sm flex-1 hover:bg-slate-100 transition">
+                                <input type="radio" name="gender" value="L" required class="accent-emerald-700 h-4 w-4">
+                                <span class="text-slate-700 font-semibold text-xs sm:text-sm">Laki-laki (L)</span>
+                            </label>
+                            <label class="flex items-center gap-2.5 cursor-pointer bg-slate-50 border border-slate-200 px-4 py-2.5 rounded-xl text-sm flex-1 hover:bg-slate-100 transition">
+                                <input type="radio" name="gender" value="P" required class="accent-emerald-700 h-4 w-4">
+                                <span class="text-slate-700 font-semibold text-xs sm:text-sm">Perempuan (P)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Level Select -->
+                    <div>
+                        <label for="level" class="block text-xs font-semibold text-slate-700 mb-1">Jenjang Alumni <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+                            </span>
+                            <select id="level" required 
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition appearance-none">
+                                <option value="" disabled selected>Pilih Jenjang Sekolah</option>
+                                <option value="TK">Taman Kanak-Kanak (TK)</option>
+                                <option value="MI">Madrasah Ibtidaiyah (MI)</option>
+                                <option value="MTs">Madrasah Tsananyah (MTs)</option>
+                                <option value="SMA">Sekolah Menengah Atas (SMA)</option>
+                                <option value="Abituren">Abituren (Lulusan Pesantren)</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 pointer-events-none">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Graduation Year -->
+                    <div>
+                        <label for="gradYear" class="block text-xs font-semibold text-slate-700 mb-1">Tahun Lulus (Angkatan) <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                            </span>
+                            <input type="number" id="gradYear" required min="1950" max="2027" placeholder="Contoh: 2018"
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="phone" class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp/HP <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                            </span>
+                            <input type="tel" id="phone" required placeholder="Contoh: 08123456789"
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <!-- Korda (Koordinator Daerah) Select -->
+                    <div>
+                        <label for="korda" class="block text-xs font-semibold text-slate-700 mb-1">Korda (Koordinator Daerah) <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="map" class="w-4 h-4"></i>
+                            </span>
+                            <select id="korda" required 
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition appearance-none">
+                                <option value="" disabled selected>Pilih Wilayah Korda</option>
+                                <option value="Pecalongan">Pecalongan</option>
+                                <option value="Kerang">Kerang</option>
+                                <option value="Bengkoanyar">Bengkoanyar</option>
+                                <option value="Jebung Kidul">Jebung Kidul</option>
+                                <option value="Lombuk">Lombuk</option>
+                                <option value="Lainnya">Lainnya (Luar Daerah)</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 pointer-events-none">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Current Domicile (Text Input) -->
+                    <div>
+                        <label for="domicile" class="block text-xs font-semibold text-slate-700 mb-1">Domisili Saat Ini <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="domicile" required placeholder="Contoh: Bondowoso, Situbondo, Jakarta"
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <!-- Current Activity / Occupation -->
+                    <div>
+                        <label for="occupation" class="block text-xs font-semibold text-slate-700 mb-1">Aktivitas / Pekerjaan Sekarang</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                                <i data-lucide="briefcase" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="occupation" placeholder="Contoh: Mahasiswa, Wiraswasta, PNS"
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="pt-2 flex flex-col gap-2">
+                        <button type="submit" id="submitBtn"
+                            class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl text-sm transition-all shadow-md flex items-center justify-center gap-2 transform active:scale-95">
+                            <i data-lucide="check-square" class="w-5 h-5"></i>
+                            <span id="submitText">Simpan Kehadiran</span>
+                        </button>
+                        
+                        <button type="button" id="clearFormBtn"
+                            class="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-xl text-xs transition">
+                            Reset Form
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Right Column: List & Filter (8 Cols on LG) -->
+            <section class="lg:col-span-8 space-y-4">
+                
+                <!-- Filter and Search Card -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </span>
+                        <input type="text" id="searchInput" placeholder="Cari nama, angkatan, domisili, pekerjaan..." 
+                            class="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition">
+                    </div>
+
+                    <!-- Filter & Export Controls -->
+                    <div class="flex flex-wrap w-full sm:w-auto items-center gap-2 justify-end">
+                        <!-- Level Filter Dropdown -->
+                        <div class="relative min-w-[130px]">
+                            <select id="filterLevel" 
+                                class="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none font-medium">
+                                <option value="ALL">Semua Jenjang</option>
+                                <option value="TK">Hanya TK</option>
+                                <option value="MI">Hanya MI</option>
+                                <option value="MTs">Hanya MTs</option>
+                                <option value="SMA">Hanya SMA</option>
+                                <option value="Abituren">Hanya Abituren</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 pointer-events-none">
+                                <i data-lucide="filter" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+
+                        <!-- Korda Filter Dropdown -->
+                        <div class="relative min-w-[140px]">
+                            <select id="filterKorda" 
+                                class="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 appearance-none font-medium">
+                                <option value="ALL">Semua Korda</option>
+                                <option value="Pecalongan">Korda Pecalongan</option>
+                                <option value="Kerang">Korda Kerang</option>
+                                <option value="Bengkoanyar">Korda Bengkoanyar</option>
+                                <option value="Jebung Kidul">Korda Jebung Kidul</option>
+                                <option value="Lombuk">Korda Lombuk</option>
+                                <option value="Lainnya">Korda Lainnya (Luar)</option>
+                            </select>
+                            <span class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 pointer-events-none">
+                                <i data-lucide="map" class="w-4 h-4"></i>
+                            </span>
+                        </div>
+
+                        <!-- EXCEL EXPORT BUTTON -->
+                        <button id="exportExcelBtn" 
+                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-2 transition shadow-sm hover:shadow-md active:scale-95">
+                            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                            Ekspor ke Excel
+                        </button>
+
+                        <!-- Clear All Cloud Data Button -->
+                        <button id="clearDatabaseBtn" 
+                            class="p-2 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-xl transition"
+                            title="Kosongkan Semua Data Awan">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Card Container -->
+                <div class="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden relative">
+                    <!-- Elegant Header for Table Card -->
+                    <div class="bg-emerald-50/50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                        <span class="text-sm font-bold text-emerald-900 flex items-center gap-2">
+                            <i data-lucide="list-checks" class="w-5 h-5 text-emerald-700"></i>
+                            Tabel Data Kehadiran (Terintegrasi Awan)
+                        </span>
+                        <span id="showing-count" class="text-xs text-slate-500 bg-white px-2 py-1 rounded-lg border border-slate-100 font-semibold">
+                            Menampilkan: 0 Tamu
+                        </span>
+                    </div>
+
+                    <!-- Table Responsive Wrapper -->
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-100 text-[11px] font-bold text-slate-500 tracking-wider uppercase">
+                                    <th class="py-3 px-4 w-12 text-center">No</th>
+                                    <th class="py-3 px-4">Nama Lengkap</th>
+                                    <th class="py-3 px-4 w-28">Jenjang</th>
+                                    <th class="py-3 px-4 w-24 text-center">Lulusan</th>
+                                    <th class="py-3 px-4">Kontak (WA)</th>
+                                    <th class="py-3 px-4">Korda / Domisili / Pekerjaan</th>
+                                    <th class="py-3 px-4 w-32 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody" class="divide-y divide-slate-100 text-sm text-slate-600">
+                                <!-- Dynamic rows loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State Placeholder -->
+                    <div id="emptyState" class="hidden py-16 text-center">
+                        <div class="inline-flex p-4 bg-emerald-50 text-emerald-600 rounded-full mb-3">
+                            <i data-lucide="user-x" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="font-bold text-slate-700 text-base">Belum ada tamu terdaftar di database</h3>
+                        <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Isi formulir di sebelah kiri atau klik tombol di bawah untuk mengisi data simulasi.</p>
+                        <button id="seedDataBtn" class="mt-4 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl text-xs border border-emerald-200 transition">
+                            Muat Data Contoh
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-emerald-950 text-emerald-200 border-t border-emerald-800/80 mt-12 py-6 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="mb-1 font-semibold text-emerald-100">&copy; 2026 IKLAL (Ikatan Keluarga Alumni Al Fattah). All Rights Reserved.</p>
+            <p class="text-emerald-400">Penyimpanan Bersama Terkoneksi Real-time &middot; Ekspor format instan (.XLSX)</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK Imports & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, addDoc, deleteDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global environment variables
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "",
+            authDomain: "iklal-attendance.firebaseapp.com",
+            projectId: "iklal-attendance",
+            storageBucket: "iklal-attendance.appspot.com",
+            messagingSenderId: "12345678",
+            appId: "1:12345678:web:12345678"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Global
+        let guests = [];
+        let currentUser = null;
+        let confirmCallback = null;
+        let isCloudMode = false; // Track if we are actively connected to Firestore
+        let connectionTimeout = null;
+
+        // Edit State Variables
+        let editingGuestId = null;
+        let editingTimestamp = null;
+
+        // Dynamic Elements
+        const form = document.getElementById('attendanceForm');
+        const tableBody = document.getElementById('attendanceTableBody');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const filterLevel = document.getElementById('filterLevel');
+        const filterKorda = document.getElementById('filterKorda');
+        const fullNameInput = document.getElementById('fullName');
+        const cloudBadge = document.getElementById('cloud-badge');
+        const cloudBadgeText = document.getElementById('cloud-badge-text');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const clearFormBtn = document.getElementById('clearFormBtn');
+        
+        // Counter Elements
+        const statTotal = document.getElementById('stat-total');
+        const statTotalL = document.getElementById('stat-total-l');
+        const statTotalP = document.getElementById('stat-total-p');
+        const statTk = document.getElementById('stat-tk');
+        const statMi = document.getElementById('stat-mi');
+        const statMts = document.getElementById('stat-mts');
+        const statSma = document.getElementById('stat-sma');
+        const statAbituren = document.getElementById('stat-abituren');
+        const showingCountText = document.getElementById('showing-count');
+
+        // Modal Elements
+        const confirmModal = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
+        // Initial Sample Seeding Data
+        const initialMockData = [
+            {
+                id: "alumni-1",
+                fullName: "Ahmad Nur Hidayat, S.H.",
+                gender: "L",
+                level: "SMA",
+                gradYear: 2015,
+                phone: "081299887766",
+                korda: "Pecalongan",
+                domicile: "Pecalongan Barat",
+                occupation: "Advokat / Konsultan Hukum",
+                timestamp: "2026-05-28 10:30",
+                waSent: true
+            },
+            {
+                id: "alumni-2",
+                fullName: "Siti Fatimah Az-Zahra, M.Si",
+                gender: "P",
+                level: "MTs",
+                gradYear: 2011,
+                phone: "082344556677",
+                korda: "Kerang",
+                domicile: "Suko Jember",
+                occupation: "Dosen Biologi",
+                timestamp: "2026-05-28 10:45",
+                waSent: false
+            },
+            {
+                id: "alumni-3",
+                fullName: "Muhammad Rizky Maulana",
+                gender: "L",
+                level: "Abituren",
+                gradYear: 2020,
+                phone: "085712345678",
+                korda: "Bengkoanyar",
+                domicile: "Bengkoanyar Kulon",
+                occupation: "Wirausaha Muda (Kuliner)",
+                timestamp: "2026-05-28 11:02",
+                waSent: true
+            },
+            {
+                id: "alumni-4",
+                fullName: "Khansa Nabila Salsabila",
+                gender: "P",
+                level: "MI",
+                gradYear: 2017,
+                phone: "089677889900",
+                korda: "Jebung Kidul",
+                domicile: "Jebung Timur",
+                occupation: "Mahasiswi Kedokteran",
+                timestamp: "2026-05-28 11:15",
+                waSent: false
+            },
+            {
+                id: "alumni-5",
+                fullName: "Fatih Al-Faruq",
+                gender: "L",
+                level: "TK",
+                gradYear: 2022,
+                phone: "081399001122",
+                korda: "Lombuk",
+                domicile: "Lombuk Tengah",
+                occupation: "Pelajar SD",
+                timestamp: "2026-05-28 11:20",
+                waSent: false
+            }
+        ];
+
+        // Helper: Convert timestamp "YYYY-MM-DD HH:MM" to "DD Bulan YYYY • HH:MM WIB"
+        function formatIndonesianDate(timestampStr) {
+            if (!timestampStr) return "";
+            try {
+                const parts = timestampStr.split(' ');
+                const datePart = parts[0]; // "YYYY-MM-DD"
+                const timePart = parts[1] || "00:00"; // "HH:MM"
+                
+                const dateParts = datePart.split('-');
+                const year = dateParts[0];
+                const monthNum = parseInt(dateParts[1]);
+                const day = parseInt(dateParts[2]);
+                
+                const months = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                const monthName = months[monthNum - 1] || "";
+                
+                return `${day} ${monthName} ${year} • ${timePart} WIB`;
+            } catch (e) {
+                return timestampStr; // Fallback
+            }
+        }
+
+        // Switch automatically to local fallback mode when Firebase connection is taking too long
+        function switchToLocalMode() {
+            if (isCloudMode) return; // Already connected to cloud previously, do nothing
+            
+            if (connectionTimeout) clearTimeout(connectionTimeout);
+            isCloudMode = false;
+            updateConnectionStatus(false, "Mode Lokal (Aktif)");
+
+            // Load data from Local Storage fallback
+            const storedGuests = localStorage.getItem('alumni_guests');
+            if (storedGuests) {
+                guests = JSON.parse(storedGuests);
+            } else {
+                guests = [...initialMockData];
+                localStorage.setItem('alumni_guests', JSON.stringify(guests));
+            }
+            updateDashboard();
+            showToast("Mode Lokal Diaktifkan", "Koneksi awan lambat. Data disimpan instan di browser ini.", false);
+        }
+
+        // Mark a specific guest as WA Sent in Local & Cloud (Firestore RULE 1 Path)
+        async function markWaAsSent(id) {
+            if (!id) return;
+
+            // 1. Update in-memory local state first
+            guests = guests.map(g => {
+                if (g.id === id) {
+                    return { ...g, waSent: true };
+                }
+                return g;
+            });
+            localStorage.setItem('alumni_guests', JSON.stringify(guests));
+
+            // 2. Synchronize with Cloud if active
+            if (isCloudMode && currentUser && !id.startsWith('mock-')) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guests', id);
+                    await setDoc(docRef, { waSent: true }, { merge: true });
+                } catch (err) {
+                    console.error("Gagal memperbarui status WA di awan:", err);
+                }
+            }
+            updateDashboard();
+        }
+
+        // Send confirmation text message to guest's WhatsApp directly and track status
+        async function sendWhatsAppConfirmation(g) {
+            let levelLabel = g.level;
+            if (g.level === "TK") levelLabel = "Taman Kanak-Kanak (TK)";
+            else if (g.level === "MI") levelLabel = "Madrasah Ibtidaiyah (MI)";
+            else if (g.level === "MTs") levelLabel = "Madrasah Tsanawiyah (MTs)";
+            else if (g.level === "SMA") levelLabel = "SMA";
+            else if (g.level === "Abituren") levelLabel = "Abituren (Lulusan Pesantren)";
+
+            const prettyDate = formatIndonesianDate(g.timestamp);
+
+            // Updated WhatsApp Template Matching User's Draft precisely with bold formatting markers
+            const messageText = `*KONFIRMASI PRESENSI KEHADIRAN*
+*REUNI AKBAR 2026*
+*“Merajut Kembali Ukhuwah Alumni Dalam Rahim Al Fattah”*
+
+_Assalamualaikum Wr. Wb._
+Yth. Kakak/Sdr. *${g.fullName}*
+
+Terima kasih telah melakukan presensi kehadiran pada acara Reuni Akbar Alumni IKLAL Al Fattah 2026. Data kehadiran Anda telah berhasil tercatat di sistem panitia.
+
+📝 Nama: *${g.fullName}*
+
+🎓 Angkatan: *${g.gradYear}*
+
+🏫 Jenjang: *${levelLabel}*
+
+📍 Korda: *${g.korda}*
+
+⏱️ Presensi: *${prettyDate}*
+
+Terima kasih atas partisipasi dan kehadiran Anda dalam mempererat tali silaturahmi keluarga besar alumni Al Fattah.
+Selamat mengikuti rangkaian acara reuni.
+
+_Wassalamualaikum Wr. Wb._`;
+
+            const formattedPhone = formatWhatsAppNumber(g.phone);
+            const waUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(messageText)}`;
+            
+            // Open WhatsApp link in a secure new tab
+            window.open(waUrl, '_blank');
+
+            // Set the waSent status to true instantly
+            await markWaAsSent(g.id);
+        }
+
+        // Load data to edit form
+        function startEditGuest(g) {
+            // Populate form fields
+            fullNameInput.value = g.fullName;
+            
+            const genderRadio = document.querySelector(`input[name="gender"][value="${g.gender}"]`);
+            if (genderRadio) {
+                genderRadio.checked = true;
+            }
+            
+            document.getElementById('level').value = g.level;
+            document.getElementById('gradYear').value = g.gradYear;
+            document.getElementById('phone').value = g.phone;
+            document.getElementById('korda').value = g.korda;
+            document.getElementById('domicile').value = g.domicile;
+            document.getElementById('occupation').value = g.occupation === '-' ? '' : g.occupation;
+            
+            // Set edit states
+            editingGuestId = g.id;
+            editingTimestamp = g.timestamp; // Hold original timestamp
+            
+            // Switch UI of form buttons to Edit Mode
+            submitBtn.classList.remove('bg-emerald-700', 'hover:bg-emerald-800');
+            submitBtn.classList.add('bg-amber-600', 'hover:bg-amber-700');
+            submitText.textContent = "Perbarui Kehadiran";
+            
+            clearFormBtn.textContent = "Batal Edit";
+            clearFormBtn.classList.remove('bg-slate-100', 'hover:bg-slate-200', 'text-slate-600');
+            clearFormBtn.classList.add('bg-red-50', 'hover:bg-red-100', 'text-red-600');
+            
+            // Scroll layout smoothly to form input area
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Auto focus and select name field text for rapid adjustments
+            fullNameInput.focus();
+            fullNameInput.select();
+            
+            showToast("Mode Edit Aktif", `Sedang mengubah data kehadiran "${g.fullName}"`);
+        }
+
+        // Revert form back to normal Add Mode
+        function cancelEdit() {
+            editingGuestId = null;
+            editingTimestamp = null;
+            form.reset();
+            
+            // Revert Button Styles
+            submitBtn.classList.add('bg-emerald-700', 'hover:bg-emerald-800');
+            submitBtn.classList.remove('bg-amber-600', 'hover:bg-amber-700');
+            submitText.textContent = "Simpan Kehadiran";
+            
+            clearFormBtn.textContent = "Reset Form";
+            clearFormBtn.classList.add('bg-slate-100', 'hover:bg-slate-200', 'text-slate-600');
+            clearFormBtn.classList.remove('bg-red-50', 'hover:bg-red-100', 'text-red-600');
+            
+            fullNameInput.focus();
+        }
+
+        // 1. Initial Load & Auth Cycle (RULE 3)
+        window.addEventListener('DOMContentLoaded', async () => {
+            lucide.createIcons();
+            fullNameInput.focus();
+            
+            // Set up Modal action listeners
+            modalCancelBtn.addEventListener('click', closeConfirmModal);
+            modalConfirmBtn.addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+            });
+
+            // Set up UI Filters & Controls
+            searchInput.addEventListener('input', updateDashboard);
+            filterLevel.addEventListener('change', updateDashboard);
+            filterKorda.addEventListener('change', updateDashboard);
+            document.getElementById('exportExcelBtn').addEventListener('click', exportToExcel);
+            document.getElementById('clearDatabaseBtn').addEventListener('click', handleClearDatabase);
+            document.getElementById('seedDataBtn').addEventListener('click', seedMockData);
+            form.addEventListener('submit', handleAddGuest);
+            
+            // Flexible Clear Form / Cancel Edit Listener
+            clearFormBtn.addEventListener('click', () => {
+                if (editingGuestId) {
+                    cancelEdit();
+                } else {
+                    form.reset();
+                    fullNameInput.focus();
+                }
+            });
+
+            // Trigger a strict 3-second connection timeout fallback
+            connectionTimeout = setTimeout(() => {
+                switchToLocalMode();
+            }, 3000);
+
+            // Authenticate FIRST before running queries
+            await initAuth();
+        });
+
+        // Auth initialization with Custom Token or Anonymous fallback (RULE 3)
+        async function initAuth() {
+            try {
+                updateConnectionStatus(false, "Menghubungkan Awan...");
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Authentication failed, switching to offline fallback mode:", err);
+                switchToLocalMode();
+            }
+        }
+
+        // Auth state listener (RULE 3)
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                isCloudMode = true;
+                if (connectionTimeout) clearTimeout(connectionTimeout);
+                
+                updateConnectionStatus(true, "Awan Aktif (Tersinkron)");
+                
+                // Set up real-time listener ONLY after auth is successful (RULE 3)
+                setupFirestoreListener();
+            } else {
+                currentUser = null;
+                switchToLocalMode();
+            }
+        });
+
+        // 2. Setup Real-time listener for Public Path (RULE 1 & RULE 2)
+        function setupFirestoreListener() {
+            if (!currentUser) return;
+
+            // Strict collection path matching rule 1
+            const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'guests');
+
+            // Listening to the collection in real-time (Rule 2: Fetch all, sort and filter in JS memory)
+            onSnapshot(collectionRef, (snapshot) => {
+                guests = [];
+                snapshot.forEach((docSnap) => {
+                    guests.push({
+                        id: docSnap.id,
+                        ...docSnap.data()
+                    });
+                });
+
+                // Rule 2 Sorting (Sort by Timestamp Descending in memory)
+                guests.sort((a, b) => {
+                    const timeA = new Date(a.timestamp || 0);
+                    const timeB = new Date(b.timestamp || 0);
+                    return timeB - timeA;
+                });
+
+                // Update local storage backup
+                localStorage.setItem('alumni_guests', JSON.stringify(guests));
+                updateDashboard();
+            }, (error) => {
+                console.error("Firestore onSnapshot error: ", error);
+                switchToLocalMode();
+            });
+        }
+
+        // Update Badge connection status in header
+        function updateConnectionStatus(isConnected, message) {
+            if (isConnected) {
+                cloudBadge.className = "inline-flex items-center gap-1.5 bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-500/30 text-[10px] text-emerald-300 font-medium";
+                cloudBadgeText.textContent = message;
+            } else {
+                cloudBadge.className = "inline-flex items-center gap-1.5 bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-500/30 text-[10px] text-amber-300 font-medium";
+                cloudBadgeText.textContent = message;
+            }
+        }
+
+        // Custom Confirmation Modal trigger
+        function openConfirmModal(title, message, onConfirm) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            confirmCallback = () => {
+                onConfirm();
+                closeConfirmModal();
+            };
+
+            confirmModal.classList.remove('hidden');
+            setTimeout(() => {
+                confirmModal.classList.remove('opacity-0');
+                confirmModal.querySelector('.transform').classList.remove('scale-95');
+                confirmModal.querySelector('.transform').classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeConfirmModal() {
+            confirmModal.classList.add('opacity-0');
+            confirmModal.querySelector('.transform').classList.remove('scale-100');
+            confirmModal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => {
+                confirmModal.classList.add('hidden');
+            }, 300);
+            confirmCallback = null;
+        }
+
+        // Add guest to Firestore Database (RULE 1 & RULE 3 check) or Local backup
+        async function handleAddGuest(e) {
+            e.preventDefault();
+
+            const fullName = fullNameInput.value.trim();
+            const genderNode = document.querySelector('input[name="gender"]:checked');
+            const gender = genderNode ? genderNode.value : '';
+            const level = document.getElementById('level').value;
+            const gradYear = parseInt(document.getElementById('gradYear').value);
+            const phone = document.getElementById('phone').value.trim();
+            const korda = document.getElementById('korda').value;
+            const domicile = document.getElementById('domicile').value.trim();
+            const occupation = document.getElementById('occupation').value.trim() || '-';
+
+            // Simple validation check
+            if (!fullName || !gender || !level || !gradYear || !phone || !korda || !domicile) {
+                showToast("Peringatan", "Mohon isi semua field wajib (*)", true);
+                fullNameInput.focus();
+                return;
+            }
+
+            // ANTI-DUPLICATE CHECK: Prevent identical Name and Level combination
+            const isDuplicate = guests.some(g => 
+                g.id !== editingGuestId &&
+                g.fullName.trim().toLowerCase() === fullName.toLowerCase() && 
+                g.level === level
+            );
+
+            if (isDuplicate) {
+                showToast(
+                    "Pendaftaran Gagal", 
+                    `Alumni bernama "${fullName}" sudah terdaftar pada jenjang yang sama.`, 
+                    true
+                );
+                fullNameInput.focus();
+                fullNameInput.select(); 
+                return;
+            }
+
+            // Timestamp decision: keep original timestamp on edit mode, generate new on create mode
+            let timestamp;
+            if (editingGuestId && editingTimestamp) {
+                timestamp = editingTimestamp;
+            } else {
+                const now = new Date();
+                timestamp = now.getFullYear() + '-' + 
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(now.getDate()).padStart(2, '0') + ' ' + 
+                    String(now.getHours()).padStart(2, '0') + ':' + 
+                    String(now.getMinutes()).padStart(2, '0');
+            }
+
+            // Keep existing WA sent status on edit, or initialize as false for new records (since auto-send is removed)
+            let waSentValue = false;
+            if (editingGuestId) {
+                const existing = guests.find(g => g.id === editingGuestId);
+                waSentValue = existing ? (existing.waSent || false) : false;
+            }
+
+            const guestData = {
+                fullName,
+                gender,
+                level,
+                gradYear,
+                phone,
+                korda,
+                domicile,
+                occupation,
+                timestamp,
+                waSent: waSentValue
+            };
+
+            if (editingGuestId) {
+                // --- UPDATE REGISTERED GUEST MODE ---
+                const updatedLocalGuests = guests.map(g => {
+                    if (g.id === editingGuestId) {
+                        return { id: editingGuestId, ...guestData };
+                    }
+                    return g;
+                });
+                localStorage.setItem('alumni_guests', JSON.stringify(updatedLocalGuests));
+
+                if (isCloudMode && currentUser) {
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guests', editingGuestId);
+                        await setDoc(docRef, guestData);
+                    } catch (err) {
+                        console.error("Cloud write failed, continuing with local data:", err);
+                        guests = updatedLocalGuests;
+                        updateDashboard();
+                    }
+                } else {
+                    guests = updatedLocalGuests;
+                    updateDashboard();
+                }
+
+                showToast("Sukses Diperbarui!", `Data atas nama "${fullName}" berhasil diperbarui.`);
+                cancelEdit(); 
+            } else {
+                // --- CREATE NEW GUEST MODE ---
+                const guestId = 'alumni-' + Date.now();
+                const updatedLocalGuests = [...guests];
+                updatedLocalGuests.unshift({ id: guestId, ...guestData });
+                localStorage.setItem('alumni_guests', JSON.stringify(updatedLocalGuests));
+
+                if (isCloudMode && currentUser) {
+                    try {
+                        // Write to Firebase Cloud
+                        const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'guests');
+                        await addDoc(colRef, guestData);
+                    } catch (err) {
+                        console.error("Cloud write failed, continuing with local data:", err);
+                        guests = updatedLocalGuests;
+                        updateDashboard();
+                    }
+                } else {
+                    guests = updatedLocalGuests;
+                    updateDashboard();
+                }
+
+                // Reset UI & autofocus
+                form.reset();
+                showToast("Sukses Disimpan!", `Atas nama "${fullName}" berhasil didaftarkan secara aman.`);
+                fullNameInput.focus();
+            }
+        }
+
+        // Delete guest from Cloud and Local
+        async function deleteGuest(id, name) {
+            openConfirmModal(
+                "Hapus Data Alumni", 
+                `Apakah Anda yakin ingin menghapus data alumni "${name}"?`, 
+                async () => {
+                    const updatedLocalGuests = guests.filter(g => g.id !== id);
+                    localStorage.setItem('alumni_guests', JSON.stringify(updatedLocalGuests));
+
+                    if (isCloudMode && currentUser) {
+                        try {
+                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guests', id);
+                            await deleteDoc(docRef);
+                        } catch (err) {
+                            console.error("Cloud delete failed, continuing with local data:", err);
+                            guests = updatedLocalGuests;
+                            updateDashboard();
+                        }
+                    } else {
+                        guests = updatedLocalGuests;
+                        updateDashboard();
+                    }
+                    showToast("Terhapus", `Data alumni "${name}" berhasil dihapus.`);
+                    fullNameInput.focus();
+                }
+            );
+        }
+
+        // Clear all documents from the Database
+        async function handleClearDatabase() {
+            openConfirmModal(
+                "Kosongkan Database", 
+                "PERINGATAN: Semua data pendaftaran alumni akan dihapus secara permanen! Tindakan ini tidak dapat dibatalkan.", 
+                async () => {
+                    localStorage.setItem('alumni_guests', JSON.stringify([]));
+
+                    if (isCloudMode && currentUser) {
+                        try {
+                            const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'guests');
+                            const querySnap = await getDocs(colRef);
+                            
+                            const deletePromises = [];
+                            querySnap.forEach((docSnap) => {
+                                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'guests', docSnap.id);
+                                deletePromises.push(deleteDoc(docRef));
+                            });
+
+                            await Promise.all(deletePromises);
+                        } catch (err) {
+                            console.error("Cloud clear failed:", err);
+                        }
+                    }
+                    
+                    guests = [];
+                    updateDashboard();
+                    showToast("Dikosongkan", "Semua data berhasil dibersihkan.", true);
+                    fullNameInput.focus();
+                }
+            );
+        }
+
+        // Seed mock data for demo presentation
+        async function seedMockData() {
+            const tempGuests = [...guests];
+            initialMockData.forEach(data => {
+                tempGuests.unshift({
+                    id: 'mock-' + Math.random(),
+                    ...data
+                });
+            });
+
+            localStorage.setItem('alumni_guests', JSON.stringify(tempGuests));
+
+            if (isCloudMode && currentUser) {
+                try {
+                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'guests');
+                    const addPromises = initialMockData.map(data => addDoc(colRef, data));
+                    await Promise.all(addPromises);
+                } catch (err) {
+                    console.error("Cloud seeding failed:", err);
+                }
+            } else {
+                guests = tempGuests;
+                updateDashboard();
+            }
+
+            showToast("Simulasi Berhasil", "Berhasil memuat data contoh!");
+            fullNameInput.focus();
+        }
+
+        // Calculate and Update Counter Cards and Render Filtered Table Data (In-Memory Processing - Rule 2)
+        function updateDashboard() {
+            const searchValue = searchInput.value.toLowerCase().trim();
+            const selectedLevel = filterLevel.value;
+            const selectedKorda = filterKorda.value;
+
+            // 1. Calculate Statistics based on ALL guests (including total L/P)
+            const counts = {
+                total: guests.length,
+                totalL: 0,
+                totalP: 0,
+                TK: 0,
+                MI: 0,
+                MTs: 0,
+                SMA: 0,
+                Abituren: 0
+            };
+
+            guests.forEach(g => {
+                if (counts[g.level] !== undefined) {
+                    counts[g.level]++;
+                }
+                if (g.gender === "L") {
+                    counts.totalL++;
+                } else if (g.gender === "P") {
+                    counts.totalP++;
+                }
+            });
+
+            // Update Counter Text values on UI
+            statTotal.textContent = counts.total;
+            statTotalL.textContent = counts.totalL;
+            statTotalP.textContent = counts.totalP;
+            
+            statTk.textContent = counts.TK;
+            statMi.textContent = counts.MI;
+            statMts.textContent = counts.MTs;
+            statSma.textContent = counts.SMA;
+            statAbituren.textContent = counts.Abituren;
+
+            // 2. Filter data for displaying
+            const filteredGuests = guests.filter(g => {
+                const matchesLevel = (selectedLevel === "ALL" || g.level === selectedLevel);
+                const matchesKorda = (selectedKorda === "ALL" || g.korda === selectedKorda);
+                const matchesSearch = 
+                    g.fullName.toLowerCase().includes(searchValue) ||
+                    (g.korda && g.korda.toLowerCase().includes(searchValue)) ||
+                    g.domicile.toLowerCase().includes(searchValue) ||
+                    g.occupation.toLowerCase().includes(searchValue) ||
+                    g.phone.includes(searchValue) ||
+                    g.gradYear.toString().includes(searchValue);
+
+                return matchesLevel && matchesKorda && matchesSearch;
+            });
+
+            // 3. Render Table Rows
+            showingCountText.textContent = `Menampilkan: ${filteredGuests.length} Tamu`;
+            tableBody.innerHTML = '';
+
+            if (filteredGuests.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                filteredGuests.forEach((g, index) => {
+                    // Styling Badge levels
+                    let badgeClass = "bg-slate-100 text-slate-800";
+                    let levelLabel = g.level;
+                    if (g.level === "TK") {
+                        badgeClass = "bg-emerald-100 text-emerald-800 font-bold";
+                        levelLabel = "Taman Kanak-Kanak (TK)";
+                    } else if (g.level === "MI") {
+                        badgeClass = "bg-yellow-100 text-yellow-800 font-bold";
+                        levelLabel = "MI (SD)";
+                    } else if (g.level === "MTs") {
+                        badgeClass = "bg-blue-100 text-blue-800 font-bold";
+                        levelLabel = "MTs (SMP)";
+                    } else if (g.level === "SMA") {
+                        badgeClass = "bg-purple-100 text-purple-800 font-bold";
+                        levelLabel = "SMA";
+                    } else if (g.level === "Abituren") {
+                        badgeClass = "bg-amber-100 text-amber-800 font-bold";
+                        levelLabel = "Abituren";
+                    }
+
+                    // Styling Badge for Korda Categories
+                    let kordaBadgeClass = "bg-slate-100 text-slate-700";
+                    const currentKorda = g.korda || "Lainnya";
+                    if (currentKorda === "Pecalongan") kordaBadgeClass = "bg-red-50 text-red-700 border border-red-200/50";
+                    else if (currentKorda === "Kerang") kordaBadgeClass = "bg-blue-50 text-blue-700 border border-blue-200/50";
+                    else if (currentKorda === "Bengkoanyar") kordaBadgeClass = "bg-purple-50 text-purple-700 border border-purple-200/50";
+                    else if (currentKorda === "Jebung Kidul") kordaBadgeClass = "bg-orange-50 text-orange-700 border border-orange-200/50";
+                    else if (currentKorda === "Lombuk") kordaBadgeClass = "bg-teal-50 text-teal-700 border border-teal-200/50";
+
+                    // Gender display badge
+                    let genderBadge = '';
+                    if (g.gender === "L") {
+                        genderBadge = `<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200 ml-1.5" title="Laki-laki">L</span>`;
+                    } else if (g.gender === "P") {
+                        genderBadge = `<span class="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] font-extrabold bg-pink-100 text-pink-800 border border-pink-200 ml-1.5" title="Perempuan">P</span>`;
+                    }
+
+                    // Dynamic WhatsApp Confirmation Status Badge
+                    let waStatusBadge = '';
+                    if (g.waSent) {
+                        waStatusBadge = `
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-1.5">
+                                <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                                Terkirim (✓)
+                            </span>
+                        `;
+                    } else {
+                        waStatusBadge = `
+                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-500 border border-slate-200/60 mt-1.5">
+                                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                Belum Dikirim
+                            </span>
+                        `;
+                    }
+
+                    // Dynamic WhatsApp Button Styling based on transmission status
+                    let waButtonClass = g.waSent
+                        ? "send-wa-btn p-1.5 bg-emerald-100 text-emerald-800 hover:bg-emerald-200 rounded-lg transition-all border border-emerald-300"
+                        : "send-wa-btn p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-lg transition-all border border-emerald-200";
+                    let waButtonTitle = g.waSent ? "Kirim Ulang Konfirmasi WA" : "Kirim Konfirmasi WA";
+
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50/80 transition-all border-b border-slate-100";
+                    row.innerHTML = `
+                        <td class="py-3.5 px-4 text-center text-xs font-semibold text-slate-400">${index + 1}</td>
+                        <td class="py-3.5 px-4 font-bold text-slate-900">
+                            <div class="flex items-center flex-wrap">
+                                <span>${escapeHTML(g.fullName)}</span>
+                                ${genderBadge}
+                            </div>
+                            <span class="text-[10px] text-slate-400 font-normal block md:hidden mt-0.5">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 inline align-middle mr-1"></i>${g.timestamp}
+                            </span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <span class="px-2 py-1 rounded-lg text-xs ${badgeClass}">${levelLabel}</span>
+                        </td>
+                        <td class="py-3.5 px-4 text-center font-semibold text-slate-700">
+                            Angkatan <span class="text-emerald-700">${g.gradYear}</span>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="flex flex-col items-start">
+                                <a href="https://wa.me/${formatWhatsAppNumber(g.phone)}" target="_blank" class="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-800 font-medium hover:underline text-xs">
+                                    <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                                    ${escapeHTML(g.phone)}
+                                </a>
+                                ${waStatusBadge}
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 text-xs">
+                            <div class="flex flex-col gap-1.5">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold ${kordaBadgeClass}">
+                                        Korda: ${escapeHTML(currentKorda)}
+                                    </span>
+                                </div>
+                                <div class="text-slate-700 font-semibold flex items-center gap-1">
+                                    <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    <span>Domisili: ${escapeHTML(g.domicile)}</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-slate-400">
+                                    <i data-lucide="briefcase" class="w-3.5 h-3.5 text-slate-300"></i>
+                                    <span>${escapeHTML(g.occupation)}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button class="${waButtonClass}" title="${waButtonTitle}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                                    </svg>
+                                </button>
+                                
+                                <button class="edit-btn p-1.5 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all" title="Edit Data">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                
+                                <button class="delete-btn p-1.5 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-lg transition" title="Hapus Data">
+                                    <i data-lucide="trash" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+
+                    // Bind WhatsApp confirmation send action
+                    row.querySelector('.send-wa-btn').addEventListener('click', () => {
+                        sendWhatsAppConfirmation(g);
+                    });
+
+                    // Bind Edit action
+                    row.querySelector('.edit-btn').addEventListener('click', () => {
+                        startEditGuest(g);
+                    });
+
+                    // Bind delete listener
+                    row.querySelector('.delete-btn').addEventListener('click', () => {
+                        deleteGuest(g.id, g.fullName);
+                    });
+
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Re-render icons
+            lucide.createIcons();
+        }
+
+        // Export Data to Real Excel (.xlsx) file
+        function exportToExcel() {
+            if (guests.length === 0) {
+                showToast("Data Kosong", "Tidak ada data tamu untuk diekspor saat ini.", true);
+                fullNameInput.focus();
+                return;
+            }
+
+            const searchValue = searchInput.value.toLowerCase().trim();
+            const selectedLevel = filterLevel.value;
+            const selectedKorda = filterKorda.value;
+
+            const exportDataList = guests.filter(g => {
+                const matchesLevel = (selectedLevel === "ALL" || g.level === selectedLevel);
+                const matchesKorda = (selectedKorda === "ALL" || g.korda === selectedKorda);
+                const matchesSearch = 
+                    g.fullName.toLowerCase().includes(searchValue) ||
+                    (g.korda && g.korda.toLowerCase().includes(searchValue)) ||
+                    g.domicile.toLowerCase().includes(searchValue) ||
+                    g.occupation.toLowerCase().includes(searchValue) ||
+                    g.phone.includes(searchValue);
+
+                return matchesLevel && matchesKorda && matchesSearch;
+            });
+
+            if (exportDataList.length === 0) {
+                showToast("Tidak Ada Cocok", "Tidak ada baris data yang cocok dengan filter.", true);
+                fullNameInput.focus();
+                return;
+            }
+
+            const formattedData = exportDataList.map((g, index) => ({
+                'No': index + 1,
+                'Nama Lengkap': g.fullName,
+                'Jenis Kelamin': g.gender === 'L' ? 'Laki-laki (L)' : (g.gender === 'P' ? 'Perempuan (P)' : '-'),
+                'Jenjang Pendidikan': g.level,
+                'Tahun Lulus (Angkatan)': g.gradYear,
+                'No WhatsApp': g.phone,
+                'Konfirmasi WA': g.waSent ? 'Terkirim (✓)' : 'Belum Dikirim',
+                'Korda (Koordinator Daerah)': g.korda || 'Lainnya',
+                'Domisili Saat Ini': g.domicile,
+                'Pekerjaan / Aktivitas': g.occupation,
+                'Waktu Kehadiran': g.timestamp
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+            const colWidths = [
+                { wch: 6 }, { wch: 30 }, { wch: 18 }, { wch: 20 }, { wch: 22 },
+                { wch: 20 }, { wch: 18 }, { wch: 25 }, { wch: 25 }, { wch: 30 }, { wch: 20 }
+            ];
+            worksheet['!cols'] = colWidths;
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Kehadiran Alumni");
+
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + 
+                String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                String(today.getDate()).padStart(2, '0');
+            
+            let filterSuffix = "";
+            if (selectedLevel !== "ALL") filterSuffix += `_${selectedLevel}`;
+            if (selectedKorda !== "ALL") filterSuffix += `_Korda_${selectedKorda}`;
+
+            const fileName = `Daftar_Hadir_Alumni_IKLAL_${dateString}${filterSuffix}.xlsx`;
+            XLSX.writeFile(workbook, fileName);
+
+            showToast("Sukses Ekspor Excel", `Berhasil mengunduh ${exportDataList.length} data ke Excel!`);
+            fullNameInput.focus();
+        }
+
+        // Helper string sanitization functions
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatWhatsAppNumber(phoneNum) {
+            let cleared = phoneNum.replace(/[^0-9]/g, '');
+            if (cleared.startsWith('0')) {
+                cleared = '62' + cleared.slice(1);
+            }
+            return cleared;
+        }
+    </script>
+</body>
+</html>
